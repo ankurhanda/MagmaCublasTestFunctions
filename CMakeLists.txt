@@ -23,25 +23,20 @@ INCLUDE(SetPlatformVars)
 
 #######################################################
 ## Find required dependencies
-#FIND_PACKAGE(FREEGLUT REQUIRED)
 FIND_PACKAGE(CUDA REQUIRED)
-#FIND_PACKAGE(GLEW REQUIRED)
 FIND_PACKAGE(Threads REQUIRED)
-#FIND_PACKAGE(freenect REQUIRED)
-#FIND_PACKAGE(freenectsync REQUIRED)
-#FIND_PACKAGE(Boost 1.40 COMPONENTS thread filesystem REQUIRED)
-#FIND_PACKAGE(Pangolin REQUIRED)
 FIND_PACKAGE(CVD REQUIRED)
-#FIND_PACKAGE(Collada)
-#FIND_PACKAGE(Bullet)
+FIND_PACKAGE(MAGMA REQUIRED)
 
 #######################################################
 ## Sources
 
 SET(
   SOURCES
-  ./src/kernels/tvl1_denoising.cu
-  ./src/utils.h
+  #/usr/local/cuda/src/fortran.c
+  #/usr/local/cuda/src/fortran_thunking.c
+  #./src/kernels/tvl1_denoising.cu
+  #./src/utils.h
 )
 
 
@@ -64,57 +59,42 @@ INCLUDE_DIRECTORIES(
 	)
 
 
-#INCLUDE_DIRECTORIES(
-#  ${CUDA_SDK_ROOT_DIR}/common/inc
+INCLUDE_DIRECTORIES(
+  ${CUDA_SDK_ROOT_DIR}/common/inc
 #  ${Pangolin_INCLUDE_DIR}
-#  ${CVD_INCLUDE_DIR}
+  ${CVD_INCLUDE_DIR}
+  ${MAGMA_INCLUDE_DIR}
+  ${MAGMA_INCLUDE_DIR}/src
 #
-#)
+)
 
 LINK_LIBRARIES(
   ${LIBRARY_NAME}
-  #${GLEW_LIBRARY}
-  #${CG_LIBRARY}
-  #${CG_GL_LIBRARY}
-  #${Boost_LIBRARIES}
-  #${Pangolin_LIBRARY}
   ${CVD_LIBRARY}
+  #${MAGMA_LIBRARY}
+  magma
+  magmablas
   ${CMAKE_THREAD_LIBS_INIT}
-  #${FREEGLUT_LIBRARY}
-  libcutil_x86_64.a
-    -lGVars3
+  cutil_x86_64
+  cublas
+  GVars3
+  blas
+  lapack
+  f77blas
 
 )
 
 LINK_DIRECTORIES(
   ${CUDA_SDK_ROOT_DIR}/lib
   ${CUDA_SDK_ROOT_DIR}/common/lib
-  ${Boost_LIBRARY_DIRS}
+  ${MAGMA_INCLUDE_DIR}/../lib
+  /usr/local/cuda/lib64/
+  #${Boost_LIBRARY_DIRS}
 )
 
 # We need shared memory atomics "--maxrregcount=32""--ptxas-options=--opt-level=100"
 SET(CUDA_NVCC_FLAGS  "-arch=sm_20" "--use_fast_math" "-O3"  "--ptxas-options=--verbose" "-keep"  )
-ADD_DEFINITIONS(-DCUDA_BUILD -DBT_USE_DOUBLE_PRECISION)
-
-#SET(CMAKE_CXX_FLAGS "-Wall")
-
-
-# compile an .so for the cuda kernel files
-#CUDA_ADD_LIBRARY(cudaVision SHARED
-#    ${SOURCES}
-#)
-
-#
-#Cuda Normals
-#
-#CUDA_ADD_EXECUTABLE(NormalsCuda
-#   ${SOURCES}
-#  ./src/main/NormalsCuda/main.cpp
-#)
-
-#
-# DTAM
-#
+ADD_DEFINITIONS(-DCUDA_BUILD -DADD_ )
 
 CUDA_ADD_EXECUTABLE(MagmaCublasTestCall
    ${SOURCES}
