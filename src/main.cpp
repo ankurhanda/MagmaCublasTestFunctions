@@ -14,6 +14,8 @@
 #include "testings.h"
 #include "flops.h"
 
+using namespace std;
+
 // Flops formula
 #define PRECISION_s
 #if defined(PRECISION_z) || defined(PRECISION_c)
@@ -200,6 +202,7 @@ int main( int argc, char** argv)
                                 d_B, lddb,
                          beta,  d_C, lddc );
         end = get_current_time();
+        cout << "Total time =" << GetTimerValue(start,end) << endl;
         magma_perf = flops / GetTimerValue(start, end);
 
         cublasGetMatrix( M, N, sizeof( float ), d_C, lddc, h_C2, ldc );
